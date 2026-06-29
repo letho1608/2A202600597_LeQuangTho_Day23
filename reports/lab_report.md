@@ -1,18 +1,4 @@
-"""Report generation helper.
-
-TODO(student): implement report rendering using MetricsReport data
-and the template in reports/lab_report_template.md.
-"""
-
-from __future__ import annotations
-
-from pathlib import Path
-
-from .metrics import MetricsReport
-
-
-def render_report(metrics: MetricsReport) -> str:
-    template = f"""# Báo cáo Lab 08
+# Báo cáo Lab 08
 
 ## 1. Team / Sinh viên
 
@@ -39,19 +25,22 @@ Graph sử dụng `StateGraph(AgentState)`. Các node bao gồm việc dùng LLM
 ## 4. Kết quả Scenario
 
 **Tổng quan**
-Tổng số kịch bản: {metrics.total_scenarios}
-Tỷ lệ thành công: {metrics.success_rate:.2%}
-Tổng số lần retries: {metrics.total_retries}
-Tổng số lần ngắt (interrupts): {metrics.total_interrupts}
-Khôi phục thành công (Resume success): {metrics.resume_success}
+Tổng số kịch bản: 7
+Tỷ lệ thành công: 85.71%
+Tổng số lần retries: 0
+Tổng số lần ngắt (interrupts): 6
+Khôi phục thành công (Resume success): False
 
 | Scenario | Route kỳ vọng | Route thực tế | Thành công | Số lần Retry | Interrupts |
 |---|---|---|---|---|---|
-"""
-    for s in metrics.scenario_metrics:
-        template += f"| {s.scenario_id} | {s.expected_route} | {s.actual_route} | {s.success} | {s.retry_count} | {s.interrupt_count} |\n"
+| S01_simple | simple | simple | True | 0 | 0 |
+| S02_tool | tool | tool | True | 0 | 0 |
+| S03_missing | missing_info | missing_info | True | 0 | 0 |
+| S04_risky | risky | risky | True | 0 | 3 |
+| S05_error | error | error | True | 0 | 0 |
+| S06_delete | risky | risky | True | 0 | 3 |
+| S07_dead_letter | error | simple | False | 0 | 0 |
 
-    template += """
 ## 5. Phân tích lỗi (Failure analysis)
 
 1. Lỗi tool hoặc thử lại (Retry/tool failure): Khi công cụ gặp lỗi thoáng qua (như timeout), node retry sẽ tăng biến đếm `attempt`. Nếu `attempt >= max_attempts`, hệ thống chuyển hướng sang `dead_letter` để kết thúc mượt mà, tránh vòng lặp vô hạn.
@@ -69,12 +58,3 @@ Sử dụng `SqliteSaver` đi kèm `sqlite3` để lưu checkpoint vào database
 ## 8. Kế hoạch cải thiện
 
 Nếu có thêm thời gian, tôi sẽ triển khai code với các công cụ thực tế (real tools) thay vì mock. Bổ sung kỹ thuật streaming cho câu trả lời ở chặng cuối (final answer) và xây dựng một giao diện thực tế (UI qua Streamlit) cho tính năng HITL approval.
-"""
-    return template
-
-
-def write_report(metrics: MetricsReport, output_path: str | Path) -> None:
-    """Write the rendered report to a file."""
-    path = Path(output_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_report(metrics), encoding="utf-8")

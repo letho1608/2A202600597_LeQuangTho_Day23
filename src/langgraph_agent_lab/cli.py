@@ -9,6 +9,8 @@ from typing import Annotated
 import typer
 import yaml
 
+import dotenv
+dotenv.load_dotenv()
 from .graph import build_graph
 from .metrics import MetricsReport, metric_from_state, summarize_metrics, write_metrics
 from .persistence import build_checkpointer

@@ -120,24 +120,32 @@ The grading script will also test with scenarios you haven't seen.
 
 ## Quick start
 
+### ✅ Windows / Cross-platform Setup Guide
+
+Due to missing `make` command on Windows, this project is configured to use the Python CLI module `langgraph_agent_lab.cli` as a perfect replacement for traditional Makefile commands.
+
 ```bash
-# Option A: conda
-conda activate ai-lab
-pip install -e '.[dev]'
-pip install langchain-openai  # or langchain-anthropic
-
-# Option B: venv
+# 1. Create Virtual Environment
 python -m venv .venv
-source .venv/bin/activate
+.venv\Scripts\activate  # for Windows
+# source .venv/bin/activate # for Linux/Mac
+
+# 2. Install Dependencies
 pip install -e '.[dev]'
-pip install langchain-openai  # or langchain-anthropic
+pip install langchain-ollama  # (configured for Ollama minimax-m3:cloud)
+pip install langgraph-checkpoint-sqlite # For Checkpointer persistence extension
 
-# Configure LLM
+# 3. Environment Configuration (.env)
 cp .env.example .env
-# Edit .env — set your API key
+# The .env file is pre-configured with:
+# LLM_PROVIDER=ollama
+# LLM_MODEL=minimax-m3:cloud
+# OLLAMA_HOST=http://localhost:11434
 
-# Verify setup
-make test  # some tests will fail until you implement TODOs
+# 4. Verify & Run (Makefile CLI replacement)
+pytest                                                                                             # Run Unit test
+python -m langgraph_agent_lab.cli run-scenarios --config config.yaml --output outputs/metrics.json # Generate metrics JSON
+python -m langgraph_agent_lab.cli validate-metrics --metrics outputs/metrics.json                  # Validate locally
 ```
 
 ---
